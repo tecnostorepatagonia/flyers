@@ -240,6 +240,7 @@
       text-transform:uppercase;
       position:relative;
       color:#f0f0f0;
+      margin-bottom:16px;
     }
     .compTitle.sud{
       background:
@@ -424,8 +425,6 @@
       letter-spacing:.2px;
       text-transform:uppercase;
     }
-
-    /* ocultar botones dentro del flyer export (no hay) */
   </style>
 </head>
 
@@ -469,7 +468,7 @@
       - Competencia → carga lista de equipos.<br>
       - Canales: podés elegir varios.<br>
       - Hora válida: 19:00 (también 1900 o 19.00).<br>
-      - Exporta en 1080×1920 (Story) sin márgenes.
+      - Si una competencia no tiene partidos, NO se muestra su encabezado.
     </div>
 
     <div class="btnrow">
@@ -497,17 +496,18 @@
       </div>
 
       <div class="content">
-        <div>
+        <!-- wrappers para ocultar si no hay partidos -->
+        <div id="libWrap">
           <div class="compTitle">COPA LIBERTADORES</div>
           <div class="list" id="lib"></div>
         </div>
 
-        <div>
+        <div id="sudWrap">
           <div class="compTitle sud">COPA SUDAMERICANA</div>
           <div class="list" id="sud"></div>
         </div>
 
-        <div>
+        <div id="lpfWrap">
           <div class="compTitle lpf">LPF ARGENTINA</div>
           <div class="list" id="lpf"></div>
         </div>
@@ -524,7 +524,7 @@
   </div>
 
 <script>
-  /* ====== Canales (logos online; algunos premium/2 pueden ser placeholders) ====== */
+  /* ====== Canales (logos online) ====== */
   const logos = {
     ESPN:   "https://upload.wikimedia.org/wikipedia/commons/2/2f/ESPN_wordmark.svg",
     ESPN2:  "https://upload.wikimedia.org/wikipedia/commons/3/3e/ESPN2_logo.svg",
@@ -576,9 +576,8 @@
   const equiposLib2026 = equiposLib2026_raw.map(stripCountrySuffix);
   const equiposSud2026 = equiposSud2026_raw.map(stripCountrySuffix);
 
-  /* ====== Escudos: LPF bastante; resto placeholder hasta completar ====== */
+  /* ====== Escudos (LPF bastante; resto placeholder hasta completar) ====== */
   const escudos = {
-    // LPF
     "River Plate":"https://upload.wikimedia.org/wikipedia/commons/3/3f/Logo_River_Plate.png",
     "Boca Juniors":"https://upload.wikimedia.org/wikipedia/commons/1/1b/Boca_Juniors_logo18.png",
     "Racing Club":"https://upload.wikimedia.org/wikipedia/commons/7/7a/Racing_Club_logo.png",
@@ -602,7 +601,6 @@
     "Barracas Central":"https://upload.wikimedia.org/wikipedia/commons/2/2b/Escudo_del_Club_Atl%C3%A9tico_Barracas_Central.svg",
     "Independiente Rivadavia":"https://upload.wikimedia.org/wikipedia/commons/2/2f/Escudo_del_Club_Independiente_Rivadavia.svg",
     "Estudiantes (LP)":"https://upload.wikimedia.org/wikipedia/commons/2/2e/Estudiantes_de_La_Plata_logo.png",
-    // ejemplo extra
     "Cusco FC":"https://upload.wikimedia.org/wikipedia/commons/0/0e/Escudo_Cusco_FC.png"
   };
 
@@ -641,8 +639,6 @@
     limpiarFormulario();
   });
 
-  recargarSelectsEquipos();
-
   function getHoraNormalizada(raw){
     const s = (raw || "").trim();
     if (/^\d{1,2}[:.]\d{2}$/.test(s)) return s.replace('.',':');
@@ -665,6 +661,30 @@
   function limpiarTodo(){
     ["lpf","lib","sud"].forEach(id=>document.getElementById(id).innerHTML="");
     limpiarFormulario();
+    actualizarVisibilidadCompetencias();
+  }
+
+  function actualizarVisibilidadCompetencias(){
+    const map = [
+      { wrap: "libWrap", list: "lib" },
+      { wrap: "sudWrap", list: "sud" },
+      { wrap: "lpfWrap", list: "lpf" }
+    ];
+
+    map.forEach(({wrap, list}) => {
+      const w = document.getElementById(wrap);
+      const l = document.getElementById(list);
+      if (!w || !l) return;
+
+      const tienePartidos = l.children.length > 0;
+      w.style.display = tienePartidos ? "" : "none";
+    });
+  }
+
+  function eliminar(id){
+    const el = document.getElementById(id);
+    if (el) el.remove();
+    actualizarVisibilidadCompetencias();
   }
 
   function agregarDesdeFormulario(){
@@ -711,6 +731,7 @@
 
     document.getElementById(tipo).innerHTML += html;
     limpiarFormulario();
+    actualizarVisibilidadCompetencias();
   }
 
   async function descargar(){
@@ -726,6 +747,10 @@
     link.href = canvas.toDataURL("image/png");
     link.click();
   }
+
+  // Inicial
+  recargarSelectsEquipos();
+  actualizarVisibilidadCompetencias();
 </script>
 
 </body>
