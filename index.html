@@ -3,25 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Flyer Story </title>
+  <title>Flyer Story - TV Digital</title>
+
+  <!-- Tipografía estilo flyer (condensed + heavy) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
+
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
   <style>
     :root{
       --red:#e10000;
       --red2:#ff2a2a;
-      --black:#0b0b0b;
       --shadow: 0 10px 25px rgba(0,0,0,.35);
       --cardShadow: 0 10px 18px rgba(0,0,0,.25);
       --border: 4px solid #111;
       --text: #111;
+      --font: "Barlow Condensed", Arial, sans-serif;
     }
 
     body{
       margin:0;
       background:#111;
       color:#fff;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: var(--font);
       display:flex;
       justify-content:center;
       gap:16px;
@@ -41,8 +47,10 @@
     }
     .panel h2{
       margin:0 0 10px 0;
-      font-size:16px;
-      letter-spacing:.5px;
+      font-size:20px;
+      letter-spacing:.8px;
+      font-weight:900;
+      text-transform:uppercase;
     }
     .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
     select,input{
@@ -54,6 +62,9 @@
       outline:none;
       width:100%;
       box-sizing:border-box;
+      font-family: var(--font);
+      font-size:18px;
+      letter-spacing:.2px;
     }
     .two{display:grid; grid-template-columns: 1fr 1fr; gap:8px;}
     .btnrow{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
@@ -64,18 +75,21 @@
       cursor:pointer;
       background:var(--red);
       color:#fff;
-      font-weight:800;
-      letter-spacing:.3px;
+      font-weight:900;
+      letter-spacing:.6px;
+      font-family: var(--font);
+      font-size:18px;
+      text-transform:uppercase;
     }
     button.secondary{background:#2a2a2a;}
     button.warn{background:#b00020;}
-    .hint{font-size:12px; opacity:.85; margin-top:8px; line-height:1.3}
+    .hint{font-size:14px; opacity:.85; margin-top:8px; line-height:1.25; letter-spacing:.2px;}
     .channelsPick{
       margin-top:10px;
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap:8px;
-      font-size:13px;
+      font-size:16px;
     }
     .channelsPick label{
       background:#141414;
@@ -86,6 +100,8 @@
       gap:8px;
       align-items:center;
       user-select:none;
+      font-weight:700;
+      letter-spacing:.2px;
     }
 
     /* ====== FLYER STORY 1080x1920 ====== */
@@ -101,6 +117,7 @@
       height:1920px;
       position:relative;
       overflow:hidden;
+      font-family: var(--font);
       background:
         radial-gradient(900px 600px at 18% 10%, rgba(255,0,0,.18), transparent 55%),
         radial-gradient(700px 500px at 80% 18%, rgba(255,0,0,.18), transparent 55%),
@@ -170,15 +187,13 @@
       font-size:44px;
       letter-spacing:1px;
       opacity:.9;
+      text-transform:uppercase;
     }
 
-    .headText{
-      flex:1;
-      text-align:left;
-      line-height:1;
-    }
+    .headText{flex:1; text-align:left; line-height:1;}
+
     .tvDigital{
-      font-size:82px;
+      font-size:92px;
       font-weight:900;
       letter-spacing:1px;
       text-transform:uppercase;
@@ -187,28 +202,38 @@
       gap:14px;
       align-items:baseline;
     }
-    .tvDigital .tv{color:#f2f2f2;}
-    .tvDigital .digital{color:var(--red);}
-    .online{
-      margin-top:10px;
-      font-size:46px;
-      font-weight:900;
-      letter-spacing:2px;
-      color:#cfcfcf;
-      text-transform:uppercase;
-      text-shadow: 0 6px 16px rgba(0,0,0,.65);
+    .tvDigital .tv{
+      color:#f2f2f2;
+      text-shadow: 0 3px 0 rgba(0,0,0,.6), 0 10px 18px rgba(0,0,0,.6);
     }
+    .tvDigital .digital{
+      color:var(--red);
+      text-shadow: 0 3px 0 rgba(0,0,0,.6), 0 10px 18px rgba(0,0,0,.6);
+    }
+
+    .online{
+      margin-top:8px;
+      font-size:50px;
+      font-weight:900;
+      font-style:italic;
+      letter-spacing:3px;
+      color:#d7d7d7;
+      text-transform:uppercase;
+      text-shadow: 0 4px 0 rgba(0,0,0,.65), 0 10px 18px rgba(0,0,0,.55);
+    }
+
     .todayPill{
-      margin-top:16px;
+      margin-top:14px;
       display:inline-block;
       padding:12px 18px;
       border-radius:10px;
       background: linear-gradient(180deg, #b00000, #ff0000);
       font-weight:900;
-      font-size:34px;
-      letter-spacing:1px;
+      font-size:36px;
+      letter-spacing:1.2px;
       text-transform:uppercase;
       box-shadow: 0 10px 18px rgba(0,0,0,.45);
+      text-shadow: 0 3px 0 rgba(0,0,0,.55);
     }
 
     /* ===== CONTENT ===== */
@@ -234,13 +259,14 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:44px;
+      font-size:54px;
       font-weight:900;
-      letter-spacing:1px;
+      letter-spacing:1.2px;
       text-transform:uppercase;
       position:relative;
       color:#f0f0f0;
       margin-bottom:16px;
+      text-shadow: 0 4px 0 rgba(0,0,0,.65), 0 10px 18px rgba(0,0,0,.55);
     }
     .compTitle.sud{
       background:
@@ -252,6 +278,7 @@
         radial-gradient(240px 60px at 50% 110%, rgba(255,0,0,.20), transparent 70%),
         linear-gradient(180deg, #0a0a0a, #050505);
     }
+
     .compTitle::before, .compTitle::after{
       content:"";
       position:absolute;
@@ -266,11 +293,7 @@
     .compTitle::before{left:26px;}
     .compTitle::after{right:26px;}
 
-    .list{
-      display:flex;
-      flex-direction:column;
-      gap:22px;
-    }
+    .list{display:flex; flex-direction:column; gap:22px;}
 
     /* ===== MATCH CARD ===== */
     .matchCard{
@@ -296,8 +319,7 @@
     }
 
     .shield{
-      width:150px;
-      height:150px;
+      width:150px; height:150px;
       object-fit:contain;
       filter: drop-shadow(0 6px 10px rgba(0,0,0,.20));
       margin:auto;
@@ -306,10 +328,11 @@
 
     .teamName{
       font-weight:900;
-      font-size:34px;
-      letter-spacing:.5px;
+      font-size:44px;
+      letter-spacing:.8px;
       text-transform:uppercase;
-      line-height:1.05;
+      line-height:1.02;
+      text-shadow: 0 2px 0 rgba(0,0,0,.10);
     }
 
     .mid{
@@ -325,24 +348,28 @@
       background: linear-gradient(180deg, #b00000, #ff0000);
       color:#fff;
       font-weight:900;
-      font-size:30px;
+      font-size:34px;
       border-radius:14px;
       padding:10px 14px;
-      letter-spacing:.6px;
+      letter-spacing:.8px;
       box-shadow: 0 8px 14px rgba(0,0,0,.25);
-      min-width:140px;
+      min-width:150px;
       text-align:center;
+      text-transform:uppercase;
+      text-shadow: 0 3px 0 rgba(0,0,0,.55);
     }
     .vsPill{
       background: linear-gradient(180deg, #151515, #000);
       color:#fff;
       font-weight:900;
-      font-size:30px;
+      font-size:34px;
       border-radius:14px;
       padding:10px 16px;
       min-width:120px;
       text-align:center;
       box-shadow: 0 8px 14px rgba(0,0,0,.20);
+      text-transform:uppercase;
+      text-shadow: 0 3px 0 rgba(0,0,0,.55);
     }
 
     .broadcast{
@@ -359,8 +386,8 @@
     .broadcast .label{
       font-weight:900;
       color:#111;
-      font-size:22px;
-      letter-spacing:.6px;
+      font-size:26px;
+      letter-spacing:1px;
       text-transform:uppercase;
       margin-bottom:2px;
     }
@@ -412,25 +439,26 @@
     }
     .footerText .top{
       font-weight:900;
-      font-size:44px;
+      font-size:52px;
       text-transform:uppercase;
-      letter-spacing:.8px;
+      letter-spacing:1px;
+      text-shadow: 0 4px 0 rgba(0,0,0,.6), 0 10px 18px rgba(0,0,0,.55);
     }
-    .footerText .top .em{color:var(--red2);}
+    .footerText .top .em{color:var(--red2); font-style:italic;}
     .footerText .sub{
-      font-weight:800;
-      font-size:26px;
+      font-weight:900;
+      font-size:28px;
       opacity:.95;
       font-style:italic;
-      letter-spacing:.2px;
+      letter-spacing:.4px;
       text-transform:uppercase;
+      text-shadow: 0 3px 0 rgba(0,0,0,.55);
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Panel de control -->
   <div class="panel">
     <h2>CONFIGURAR PARTIDO</h2>
 
@@ -479,24 +507,18 @@
     </div>
   </div>
 
-  <!-- Flyer -->
   <div id="flyerWrap">
     <div id="flyer">
       <div class="header">
-        <div class="logoBox">
-          <div class="ph">LOGO</div>
-        </div>
+        <div class="logoBox"><div class="ph">LOGO</div></div>
         <div class="headText">
-          <div class="tvDigital">
-            <span class="tv">TV</span><span class="digital">DIGITAL</span>
-          </div>
+          <div class="tvDigital"><span class="tv">TV</span><span class="digital">DIGITAL</span></div>
           <div class="online">ONLINE</div>
           <div class="todayPill">PARTIDOS DE HOY</div>
         </div>
       </div>
 
       <div class="content">
-        <!-- wrappers para ocultar si no hay partidos -->
         <div id="libWrap">
           <div class="compTitle">COPA LIBERTADORES</div>
           <div class="list" id="lib"></div>
@@ -524,7 +546,6 @@
   </div>
 
 <script>
-  /* ====== Canales (logos online) ====== */
   const logos = {
     ESPN:   "https://upload.wikimedia.org/wikipedia/commons/2/2f/ESPN_wordmark.svg",
     ESPN2:  "https://upload.wikimedia.org/wikipedia/commons/3/3e/ESPN2_logo.svg",
@@ -540,7 +561,6 @@
 
   const PLACEHOLDER_SHIELD = "https://upload.wikimedia.org/wikipedia/commons/5/59/Empty.png";
 
-  /* ====== LPF 30 equipos (2026) ====== */
   const equiposLPF2026 = [
     "Aldosivi","Argentinos Juniors","Atlético Tucumán","Banfield","Barracas Central","Belgrano",
     "Boca Juniors","Central Córdoba (SdE)","Defensa y Justicia","Deportivo Riestra","Estudiantes (LP)","Estudiantes (RC)",
@@ -548,7 +568,6 @@
     "Platense","Racing Club","River Plate","Rosario Central","San Lorenzo","Sarmiento","Talleres (C)","Tigre","Unión","Vélez Sarsfield"
   ];
 
-  /* ====== Libertadores 2026 (raw con país) ====== */
   const equiposLib2026_raw = [
     "Flamengo (BRA)","Estudiantes de La Plata (ARG)","Cusco FC (PER)","Independiente Medellín (COL)",
     "Nacional (URU)","Universitario (PER)","Coquimbo Unido (CHI)","Deportes Tolima (COL)","Fluminense (BRA)",
@@ -559,7 +578,6 @@
     "Rosario Central (ARG)","Universidad Central (VEN)"
   ];
 
-  /* ====== Sudamericana 2026 (raw con país) ====== */
   const equiposSud2026_raw = [
     "América de Cali (COL)","Tigre (ARG)","Macará (ECU)","Alianza Atlético (PER)","Atlético Mineiro (BRA)","Cienciano (PER)",
     "Academia Puerto Cabello (VEN)","Juventud de Las Piedras (URU)","São Paulo (BRA)","Millonarios (COL)","Boston River (URU)",
@@ -572,11 +590,9 @@
   function stripCountrySuffix(name){
     return (name || "").replace(/\s+\([A-Z]{3}\)\s*$/u, "").trim();
   }
-
   const equiposLib2026 = equiposLib2026_raw.map(stripCountrySuffix);
   const equiposSud2026 = equiposSud2026_raw.map(stripCountrySuffix);
 
-  /* ====== Escudos (LPF bastante; resto placeholder hasta completar) ====== */
   const escudos = {
     "River Plate":"https://upload.wikimedia.org/wikipedia/commons/3/3f/Logo_River_Plate.png",
     "Boca Juniors":"https://upload.wikimedia.org/wikipedia/commons/1/1b/Boca_Juniors_logo18.png",
@@ -604,11 +620,8 @@
     "Cusco FC":"https://upload.wikimedia.org/wikipedia/commons/0/0e/Escudo_Cusco_FC.png"
   };
 
-  function shieldUrl(team){
-    return escudos[team] || PLACEHOLDER_SHIELD;
-  }
+  function shieldUrl(team){ return escudos[team] || PLACEHOLDER_SHIELD; }
 
-  /* ====== DOM ====== */
   const competition = document.getElementById("competition");
   const team1 = document.getElementById("team1");
   const team2 = document.getElementById("team2");
@@ -621,13 +634,9 @@
   }
 
   function recargarSelectsEquipos(){
-    const lista = listaPorCompetencia(competition.value)
-      .slice()
-      .sort((a,b)=>a.localeCompare(b,'es'));
-
+    const lista = listaPorCompetencia(competition.value).slice().sort((a,b)=>a.localeCompare(b,'es'));
     team1.innerHTML = "";
     team2.innerHTML = "";
-
     lista.forEach(e=>{
       team1.innerHTML += `<option>${e}</option>`;
       team2.innerHTML += `<option>${e}</option>`;
@@ -658,27 +667,24 @@
     document.querySelectorAll("input[type=checkbox]").forEach(c=>c.checked=false);
   }
 
-  function limpiarTodo(){
-    ["lpf","lib","sud"].forEach(id=>document.getElementById(id).innerHTML="");
-    limpiarFormulario();
-    actualizarVisibilidadCompetencias();
-  }
-
   function actualizarVisibilidadCompetencias(){
     const map = [
       { wrap: "libWrap", list: "lib" },
       { wrap: "sudWrap", list: "sud" },
       { wrap: "lpfWrap", list: "lpf" }
     ];
-
     map.forEach(({wrap, list}) => {
       const w = document.getElementById(wrap);
       const l = document.getElementById(list);
       if (!w || !l) return;
-
-      const tienePartidos = l.children.length > 0;
-      w.style.display = tienePartidos ? "" : "none";
+      w.style.display = (l.children.length > 0) ? "" : "none";
     });
+  }
+
+  function limpiarTodo(){
+    ["lpf","lib","sud"].forEach(id=>document.getElementById(id).innerHTML="");
+    limpiarFormulario();
+    actualizarVisibilidadCompetencias();
   }
 
   function eliminar(id){
@@ -706,7 +712,7 @@
     const matchId = "m_" + Math.random().toString(16).slice(2);
 
     const html = `
-      <div class="matchCard" id="${matchId}" data-tipo="${tipo}" data-t1="${t1}" data-t2="${t2}" data-hora="${hora}" data-canales="${canales.join(',')}">
+      <div class="matchCard" id="${matchId}">
         <div class="side">
           <img class="shield" alt="${t1}" src="${shieldUrl(t1)}" onerror="this.src='${PLACEHOLDER_SHIELD}'">
           <div class="teamName">${t1}</div>
@@ -735,6 +741,11 @@
   }
 
   async function descargar(){
+    // Espera a que carguen fuentes (mejora fidelidad en html2canvas)
+    if (document.fonts && document.fonts.ready) {
+      try { await document.fonts.ready; } catch {}
+    }
+
     const node = document.getElementById("flyer");
     const canvas = await html2canvas(node, {
       backgroundColor: null,
@@ -748,7 +759,7 @@
     link.click();
   }
 
-  // Inicial
+  // Init
   recargarSelectsEquipos();
   actualizarVisibilidadCompetencias();
 </script>
