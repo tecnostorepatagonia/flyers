@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Flyer PRO REAL</title>
+<meta charset="UTF-8" />
+<title>Flyer PRO</title>
 
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
@@ -13,7 +13,6 @@
   button.secondary{background:#333;}
   button.warn{background:#b00020;}
 
-  /* FLYER */
   #flyer{width:420px;margin:auto;background:#0a0a0a;}
   .header{padding:20px;border-bottom:3px solid red;}
   .section{margin:15px;padding:10px;background:#111;border-radius:20px;}
@@ -30,7 +29,7 @@
   .time{background:red;color:white;padding:4px 8px;border-radius:8px;display:inline-block;}
   .vs{background:black;color:white;padding:4px 8px;border-radius:5px;margin-top:3px;display:inline-block;}
 
-  .channels{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;max-width:130px;}
+  .channels{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;max-width:140px;}
   .channels img{width:35px;object-fit:contain;background:white;border-radius:6px;padding:2px;}
 
   .actions{display:flex;flex-direction:column;gap:6px;}
@@ -40,40 +39,54 @@
 
   .footer{margin:20px;padding:15px;border:2px solid red;}
 
-  .toolbar{max-width:820px;margin:0 auto 10px auto;}
+  .toolbar{max-width:980px;margin:0 auto 10px auto;}
   .hint{font-size:12px;opacity:.85}
+
+  .channel-pick{
+    display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:6px;
+    font-size:14px;
+  }
 </style>
 </head>
 
 <body>
-
 <h2>GENERADOR PRO</h2>
 
 <div class="toolbar">
+  <!-- 1) COMPETENCIA -->
+  <select id="competition">
+    <option value="lpf">LPF Argentina</option>
+    <option value="lib">CONMEBOL Libertadores</option>
+    <option value="sud">CONMEBOL Sudamericana</option>
+  </select>
+
+  <!-- 2) EQUIPOS -->
   <select id="team1"></select>
   <select id="team2"></select>
-  <input id="time" placeholder="Hora (19:00)" inputmode="numeric">
 
-  <div class="hint">Hora válida: 19:00 (también acepta 1900 o 19.00). No permite mismo equipo vs mismo equipo.</div>
+  <!-- 3) CANALES (MULTI) -->
+  <div class="channel-pick">
+    <label><input type="checkbox" value="ESPNP"> ESPN Premium</label>
+    <label><input type="checkbox" value="TNTP"> TNT Sports Premium</label>
+    <label><input type="checkbox" value="FOX"> FOX Sports</label>
+    <label><input type="checkbox" value="TYC"> TyC Sports</label>
+    <label><input type="checkbox" value="TELEFE"> Telefe</label>
+    <label><input type="checkbox" value="DISNEY"> Disney+</label>
+    <label><input type="checkbox" value="ESPN"> ESPN</label>
+    <label><input type="checkbox" value="ESPN2"> ESPN 2</label>
+    <label><input type="checkbox" value="DSPORTS"> DSPORTS</label>
+    <label><input type="checkbox" value="DSPORTS2"> DSPORTS 2</label>
+  </div>
 
-  <label>Canales:</label><br>
-  <label><input type="checkbox" value="ESPNP"> ESPN Premium</label>
-  <label><input type="checkbox" value="TNTP"> TNT Sports Premium</label>
-  <label><input type="checkbox" value="FOX"> FOX Sports</label>
-  <label><input type="checkbox" value="TYC"> TyC Sports</label>
-  <label><input type="checkbox" value="TELEFE"> Telefe</label>
-  <label><input type="checkbox" value="DISNEY"> Disney+</label>
-  <label><input type="checkbox" value="ESPN"> ESPN</label>
-  <label><input type="checkbox" value="ESPN2"> ESPN 2</label>
-  <label><input type="checkbox" value="DSPORTS"> DSPORTS</label>
-  <label><input type="checkbox" value="DSPORTS2"> DSPORTS 2</label>
+  <!-- 4) HORA -->
+  <input id="time" placeholder="Hora (19:00)" inputmode="numeric" />
+
+  <div class="hint">
+    Hora válida: 19:00 (también acepta 1900 o 19.00). Elegí al menos 1 canal.
+  </div>
 
   <br>
-
-  <button onclick="agregar('lpf')">Agregar LPF Argentina</button>
-  <button onclick="agregar('lib')">Agregar Libertadores</button>
-  <button onclick="agregar('sud')">Agregar Sudamericana</button>
-
+  <button onclick="agregarDesdeFormulario()">Agregar</button>
   <button class="secondary" onclick="limpiarFormulario()">Limpiar formulario</button>
   <button class="warn" onclick="limpiarTodo()">Limpiar todo</button>
   <button onclick="descargar()">Descargar</button>
@@ -81,7 +94,6 @@
 
 <!-- FLYER -->
 <div id="flyer">
-
   <div class="header">
     <h2>TV DIGITAL</h2>
     <div>PARTIDOS DE HOY</div>
@@ -90,87 +102,224 @@
   <div class="section">LPF ARGENTINA</div>
   <div id="lpf"></div>
 
-  <div class="section">COPA LIBERTADORES</div>
+  <div class="section">CONMEBOL LIBERTADORES</div>
   <div id="lib"></div>
 
-  <div class="section">COPA SUDAMERICANA</div>
+  <div class="section">CONMEBOL SUDAMERICANA</div>
   <div id="sud"></div>
 
   <div class="footer">
     CONTRATÁ YA DIGITAL TV<br>
     Y NO TE PIERDAS NINGÚN PARTIDO
   </div>
-
 </div>
 
 <script>
-/**
- * 30 equipos (temporada 2026).
- * Basado en listados públicos de Primera División / Liga Profesional 2026. ([es.wikipedia.org](https://es.wikipedia.org/wiki/Primera_Divisi%C3%B3n_de_Argentina?utm_source=openai))
- *
- * Nota: URLs de escudos pueden variar. Si alguno no carga, lo corregimos.
- */
+/* ====== LOGOS DE CANALES (online) ======
+   Nota: “Premium / DSports2” puede no tener logo separado en Commons; acá dejo fallback.
+*/
+const logos = {
+  ESPN:   "https://upload.wikimedia.org/wikipedia/commons/2/2f/ESPN_wordmark.svg",
+  ESPN2:  "https://upload.wikimedia.org/wikipedia/commons/3/3e/ESPN2_logo.svg",
+  ESPNP:  "https://upload.wikimedia.org/wikipedia/commons/8/8f/ESPN_Premium.png",
+  FOX:    "https://upload.wikimedia.org/wikipedia/commons/6/67/Fox_Sports_logo.svg",
+  TYC:    "https://upload.wikimedia.org/wikipedia/commons/1/12/TyC_Sports_logo.svg",
+  TELEFE: "https://upload.wikimedia.org/wikipedia/commons/3/3f/Telefe_logo.svg",
+  DISNEY: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Disney%2B_logo.svg",
+  DSPORTS:"https://upload.wikimedia.org/wikipedia/commons/3/3c/DirecTV_Sports_logo.png",
+  DSPORTS2:"https://upload.wikimedia.org/wikipedia/commons/3/3c/DirecTV_Sports_logo.png",
+  TNTP:   "https://upload.wikimedia.org/wikipedia/commons/8/82/TNT_Sports_logo.png"
+};
+
+const PLACEHOLDER_SHIELD =
+  "https://upload.wikimedia.org/wikipedia/commons/5/59/Empty.png";
+
+/* ====== LISTAS DE EQUIPOS ====== */
+const equiposLPF2026 = [
+  "Aldosivi",
+  "Argentinos Juniors",
+  "Atlético Tucumán",
+  "Banfield",
+  "Barracas Central",
+  "Belgrano",
+  "Boca Juniors",
+  "Central Córdoba (SdE)",
+  "Defensa y Justicia",
+  "Deportivo Riestra",
+  "Estudiantes (LP)",
+  "Estudiantes (RC)",
+  "Gimnasia (LP)",
+  "Gimnasia (Mendoza)",
+  "Huracán",
+  "Independiente",
+  "Independiente Rivadavia",
+  "Instituto",
+  "Lanús",
+  "Newell's Old Boys",
+  "Platense",
+  "Racing Club",
+  "River Plate",
+  "Rosario Central",
+  "San Lorenzo",
+  "Sarmiento",
+  "Talleres (C)",
+  "Tigre",
+  "Unión",
+  "Vélez Sarsfield"
+];
+
+// Libertadores 2026 (te la limpio: saco " (XXX)")
+const equiposLib2026_raw = [
+  "Flamengo (BRA)",
+  "Estudiantes de La Plata (ARG)",
+  "Cusco FC (PER)",
+  "Independiente Medellín (COL)",
+  "Nacional (URU)",
+  "Universitario (PER)",
+  "Coquimbo Unido (CHI)",
+  "Deportes Tolima (COL)",
+  "Fluminense (BRA)",
+  "Bolívar (BOL)",
+  "Deportivo La Guaira (VEN)",
+  "Independiente Rivadavia (ARG)",
+  "Boca Juniors (ARG)",
+  "Cruzeiro (BRA)",
+  "Universidad Católica (CHI)",
+  "Barcelona SC (ECU)",
+  "Peñarol (URU)",
+  "Corinthians (BRA)",
+  "Independiente Santa Fe (COL)",
+  "Platense (ARG)",
+  "Palmeiras (BRA)",
+  "Cerro Porteño (PAR)",
+  "Junior (COL)",
+  "Sporting Cristal (PER)",
+  "Liga de Quito (ECU)",
+  "Lanús (ARG)",
+  "Always Ready (BOL)",
+  "Mirassol (BRA)",
+  "Independiente del Valle (ECU)",
+  "Libertad (PAR)",
+  "Rosario Central (ARG)",
+  "Universidad Central (VEN)"
+];
+
+// Sudamericana 2026 (te la limpio: saco " (XXX)")
+const equiposSud2026_raw = [
+  "América de Cali (COL)",
+  "Tigre (ARG)",
+  "Macará (ECU)",
+  "Alianza Atlético (PER)",
+  "Atlético Mineiro (BRA)",
+  "Cienciano (PER)",
+  "Academia Puerto Cabello (VEN)",
+  "Juventud de Las Piedras (URU)",
+  "São Paulo (BRA)",
+  "Millonarios (COL)",
+  "Boston River (URU)",
+  "O'Higgins (CHI)",
+  "Santos (BRA)",
+  "San Lorenzo (ARG)",
+  "Deportivo Cuenca (ECU)",
+  "Recoleta (PAR)",
+  "Racing Club (ARG)",
+  "Caracas (VEN)",
+  "Independiente Petrolero (BOL)",
+  "Botafogo (BRA)",
+  "Gremio (BRA)",
+  "Palestino (CHI)",
+  "Montevideo City Torque (URU)",
+  "Deportivo Riestra (ARG)",
+  "Olimpia (PAR)",
+  "Vasco da Gama (BRA)",
+  "Audax Italiano (CHI)",
+  "Barracas Central (ARG)",
+  "River Plate (ARG)",
+  "RB Bragantino (BRA)",
+  "Blooming (BOL)",
+  "Carabobo (VEN)"
+];
+
+function stripCountrySuffix(name){
+  // Quita " (XXX)" al final
+  return (name || "").replace(/\s+\([A-Z]{3}\)\s*$/u, "").trim();
+}
+
+const equiposLib2026 = equiposLib2026_raw.map(stripCountrySuffix);
+const equiposSud2026 = equiposSud2026_raw.map(stripCountrySuffix);
+
+/* ====== ESCUDOS (online) ======
+   Para LPF: pongo varios conocidos.
+   Para el resto: algunos van a placeholder hasta que se ajusten URLs (ver lista al final).
+*/
 const escudos = {
-  "Aldosivi":"https://upload.wikimedia.org/wikipedia/commons/8/8d/Escudo_del_Club_Atl%C3%A9tico_Aldosivi.svg",
+  // LPF (bastante completos, ajustables)
+  "River Plate":"https://upload.wikimedia.org/wikipedia/commons/3/3f/Logo_River_Plate.png",
+  "Boca Juniors":"https://upload.wikimedia.org/wikipedia/commons/1/1b/Boca_Juniors_logo18.png",
+  "Racing Club":"https://upload.wikimedia.org/wikipedia/commons/7/7a/Racing_Club_logo.png",
+  "Independiente":"https://upload.wikimedia.org/wikipedia/commons/4/4e/CA_Independiente_logo.png",
+  "San Lorenzo":"https://upload.wikimedia.org/wikipedia/commons/7/76/San_Lorenzo_logo.png",
+  "Lanús":"https://upload.wikimedia.org/wikipedia/commons/8/8f/Club_Atl%C3%A9tico_Lan%C3%BAs_logo.png",
+  "Defensa y Justicia":"https://upload.wikimedia.org/wikipedia/commons/1/16/Defensa_y_Justicia_logo.png",
+  "Vélez Sarsfield":"https://upload.wikimedia.org/wikipedia/commons/3/32/Velez_Sarsfield_logo.png",
+  "Rosario Central":"https://upload.wikimedia.org/wikipedia/commons/4/4a/Rosario_Central_logo.png",
+  "Newell's Old Boys":"https://upload.wikimedia.org/wikipedia/commons/4/4f/Newells_Old_Boys_logo.png",
   "Argentinos Juniors":"https://upload.wikimedia.org/wikipedia/commons/3/3f/Argentinos_Juniors_logo.svg",
+  "Huracán":"https://upload.wikimedia.org/wikipedia/commons/7/79/Escudo_del_Club_Atl%C3%A9tico_Hurac%C3%A1n.svg",
   "Atlético Tucumán":"https://upload.wikimedia.org/wikipedia/commons/9/9c/Escudo_del_Club_Atl%C3%A9tico_Tucum%C3%A1n.svg",
   "Banfield":"https://upload.wikimedia.org/wikipedia/commons/7/78/Banfield_logo.svg",
-  "Barracas Central":"https://upload.wikimedia.org/wikipedia/commons/2/2b/Escudo_del_Club_Atl%C3%A9tico_Barracas_Central.svg",
-  "Belgrano":"https://upload.wikimedia.org/wikipedia/commons/4/4f/Escudo_del_Club_Atl%C3%A9tico_Belgrano.svg",
-  "Boca Juniors":"https://upload.wikimedia.org/wikipedia/commons/1/1b/Boca_Juniors_logo18.png",
-  "Central Córdoba (SdE)":"https://upload.wikimedia.org/wikipedia/commons/5/57/Escudo_Central_C%C3%B3rdoba_de_Santiago_del_Estero.svg",
-  "Defensa y Justicia":"https://upload.wikimedia.org/wikipedia/commons/1/16/Defensa_y_Justicia_logo.png",
-  "Deportivo Riestra":"https://upload.wikimedia.org/wikipedia/commons/5/5c/Escudo_del_Club_Deportivo_Riestra.svg",
-  "Estudiantes (LP)":"https://upload.wikimedia.org/wikipedia/commons/2/2e/Estudiantes_de_La_Plata_logo.png",
-  "Estudiantes (RC)":"https://upload.wikimedia.org/wikipedia/commons/8/8a/Escudo_de_Asociaci%C3%B3n_Atl%C3%A9tica_Estudiantes.png",
-  "Gimnasia y Esgrima (LP)":"https://upload.wikimedia.org/wikipedia/commons/7/7f/Escudo_del_Club_de_Gimnasia_y_Esgrima_La_Plata.svg",
-  "Gimnasia y Esgrima (M)":"https://upload.wikimedia.org/wikipedia/commons/5/59/Escudo_del_Club_Gimnasia_y_Esgrima_de_Mendoza.svg",
-  "Godoy Cruz":"https://upload.wikimedia.org/wikipedia/commons/2/21/Escudo_del_Club_Deportivo_Godoy_Cruz_Antonio_Tomba.svg",
-  "Huracán":"https://upload.wikimedia.org/wikipedia/commons/7/79/Escudo_del_Club_Atl%C3%A9tico_Hurac%C3%A1n.svg",
-  "Independiente":"https://upload.wikimedia.org/wikipedia/commons/4/4e/CA_Independiente_logo.png",
-  "Independiente Rivadavia":"https://upload.wikimedia.org/wikipedia/commons/2/2f/Escudo_del_Club_Independiente_Rivadavia.svg",
-  "Instituto":"https://upload.wikimedia.org/wikipedia/commons/8/89/Escudo_del_Instituto_Atl%C3%A9tico_Central_C%C3%B3rdoba.svg",
-  "Lanús":"https://upload.wikimedia.org/wikipedia/commons/8/8f/Club_Atl%C3%A9tico_Lan%C3%BAs_logo.png",
-  "Newell's Old Boys":"https://upload.wikimedia.org/wikipedia/commons/4/4f/Newells_Old_Boys_logo.png",
   "Platense":"https://upload.wikimedia.org/wikipedia/commons/4/48/Escudo_del_Club_Atl%C3%A9tico_Platense.svg",
-  "Racing Club":"https://upload.wikimedia.org/wikipedia/commons/7/7a/Racing_Club_logo.png",
-  "River Plate":"https://upload.wikimedia.org/wikipedia/commons/3/3f/Logo_River_Plate.png",
-  "Rosario Central":"https://upload.wikimedia.org/wikipedia/commons/4/4a/Rosario_Central_logo.png",
-  "San Lorenzo":"https://upload.wikimedia.org/wikipedia/commons/7/76/San_Lorenzo_logo.png",
-  "Sarmiento (J)":"https://upload.wikimedia.org/wikipedia/commons/3/33/Escudo_del_Club_Atl%C3%A9tico_Sarmiento.svg",
-  "Talleres (C)":"https://upload.wikimedia.org/wikipedia/commons/5/5a/Escudo_del_Club_Atl%C3%A9tico_Talleres.svg",
   "Tigre":"https://upload.wikimedia.org/wikipedia/commons/3/32/Escudo_del_Club_Atl%C3%A9tico_Tigre.svg",
-  "Unión (SF)":"https://upload.wikimedia.org/wikipedia/commons/7/7c/Escudo_del_Club_Atl%C3%A9tico_Uni%C3%B3n.svg",
-  "Vélez Sarsfield":"https://upload.wikimedia.org/wikipedia/commons/3/32/Velez_Sarsfield_logo.png"
+  "Unión":"https://upload.wikimedia.org/wikipedia/commons/7/7c/Escudo_del_Club_Atl%C3%A9tico_Uni%C3%B3n.svg",
+  "Belgrano":"https://upload.wikimedia.org/wikipedia/commons/4/4f/Escudo_del_Club_Atl%C3%A9tico_Belgrano.svg",
+  "Instituto":"https://upload.wikimedia.org/wikipedia/commons/8/89/Escudo_del_Instituto_Atl%C3%A9tico_Central_C%C3%B3rdoba.svg",
+  "Central Córdoba (SdE)":"https://upload.wikimedia.org/wikipedia/commons/5/57/Escudo_Central_C%C3%B3rdoba_de_Santiago_del_Estero.svg",
+  "Barracas Central":"https://upload.wikimedia.org/wikipedia/commons/2/2b/Escudo_del_Club_Atl%C3%A9tico_Barracas_Central.svg",
+  "Independiente Rivadavia":"https://upload.wikimedia.org/wikipedia/commons/2/2f/Escudo_del_Club_Independiente_Rivadavia.svg",
+  "Estudiantes (LP)":"https://upload.wikimedia.org/wikipedia/commons/2/2e/Estudiantes_de_La_Plata_logo.png",
+
+  // Algunos ejemplos fuera de LPF (muchos quedarán placeholder hasta ajustar)
+  "Cusco FC":"https://upload.wikimedia.org/wikipedia/commons/0/0e/Escudo_Cusco_FC.png"
 };
 
-// EQUIPOS
-const equipos = Object.keys(escudos).sort((a,b)=>a.localeCompare(b,'es'));
+function shieldUrl(team){
+  return escudos[team] || PLACEHOLDER_SHIELD;
+}
 
-// SELECT
+/* ====== DOM / SELECTS ====== */
+const competition = document.getElementById("competition");
 const team1 = document.getElementById("team1");
 const team2 = document.getElementById("team2");
-equipos.forEach(e=>{
-  team1.innerHTML += `<option>${e}</option>`;
-  team2.innerHTML += `<option>${e}</option>`;
+
+function listaPorCompetencia(comp){
+  if (comp === "lpf") return equiposLPF2026;
+  if (comp === "lib") return equiposLib2026;
+  if (comp === "sud") return equiposSud2026;
+  return [];
+}
+
+function recargarSelectsEquipos(){
+  const comp = competition.value;
+  const lista = listaPorCompetencia(comp).slice().sort((a,b)=>a.localeCompare(b,'es'));
+
+  team1.innerHTML = "";
+  team2.innerHTML = "";
+
+  lista.forEach(e=>{
+    team1.innerHTML += `<option>${e}</option>`;
+    team2.innerHTML += `<option>${e}</option>`;
+  });
+}
+
+competition.addEventListener("change", () => {
+  recargarSelectsEquipos();
+  limpiarFormulario();
 });
 
-// LOGOS TV (los que pediste)
-// Si alguno no se ve, lo ideal es reemplazar por PNGs locales en /logos.
-const logos = {
-  "ESPNP":"https://upload.wikimedia.org/wikipedia/commons/8/8f/ESPN_Premium.png",
-  "TNTP":"https://upload.wikimedia.org/wikipedia/commons/8/82/TNT_Sports_logo.png",     // placeholder (no siempre existe “Premium” como logo separado)
-  "FOX":"https://upload.wikimedia.org/wikipedia/commons/6/67/Fox_Sports_logo.svg",
-  "TYC":"https://upload.wikimedia.org/wikipedia/commons/1/12/TyC_Sports_logo.svg",
-  "TELEFE":"https://upload.wikimedia.org/wikipedia/commons/3/3f/Telefe_logo.svg",
-  "DISNEY":"https://upload.wikimedia.org/wikipedia/commons/6/6e/Disney%2B_logo.svg",
-  "ESPN":"https://upload.wikimedia.org/wikipedia/commons/2/2f/ESPN_wordmark.svg",
-  "ESPN2":"https://upload.wikimedia.org/wikipedia/commons/3/3e/ESPN2_logo.svg",
-  "DSPORTS":"https://upload.wikimedia.org/wikipedia/commons/3/3c/DirecTV_Sports_logo.png",
-  "DSPORTS2":"https://upload.wikimedia.org/wikipedia/commons/3/3c/DirecTV_Sports_logo.png" // placeholder (si tenés el logo exacto de DSports 2, lo cambiamos)
-};
+// Inicial
+recargarSelectsEquipos();
 
-// Helpers
+/* ====== HELPERS ====== */
 function getHoraNormalizada(raw){
   const s = (raw || "").trim();
   if (/^\d{1,2}[:.]\d{2}$/.test(s)) return s.replace('.',':');
@@ -195,16 +344,20 @@ function limpiarTodo(){
   limpiarFormulario();
 }
 
-// AGREGAR
-function agregar(tipo){
+/* ====== AGREGAR ====== */
+function agregarDesdeFormulario(){
+  const tipo = competition.value;
   const t1 = team1.value;
   const t2 = team2.value;
   const hora = getHoraNormalizada(document.getElementById("time").value);
 
+  if (!t1 || !t2) { alert("Elegí los equipos."); return; }
   if (t1 === t2) { alert("Elegí dos equipos distintos."); return; }
   if (!hora) { alert("Ingresá una hora válida (ej: 19:00)."); return; }
 
   const canales = getCanalesSeleccionados();
+  if (canales.length === 0) { alert("Elegí al menos un canal."); return; }
+
   const canalesHtml = canales.map(code => `<img alt="${code}" src="${logos[code]}">`).join("");
 
   const matchId = "m_" + Math.random().toString(16).slice(2);
@@ -213,7 +366,7 @@ function agregar(tipo){
   <div class="match" id="${matchId}" data-tipo="${tipo}" data-t1="${t1}" data-t2="${t2}" data-hora="${hora}" data-canales="${canales.join(',')}">
 
     <div class="team">
-      <img alt="${t1}" src="${escudos[t1]}">
+      <img alt="${t1}" src="${shieldUrl(t1)}" onerror="this.src='${PLACEHOLDER_SHIELD}'">
       <div>${t1}</div>
     </div>
 
@@ -223,7 +376,7 @@ function agregar(tipo){
     </div>
 
     <div class="team">
-      <img alt="${t2}" src="${escudos[t2]}">
+      <img alt="${t2}" src="${shieldUrl(t2)}" onerror="this.src='${PLACEHOLDER_SHIELD}'">
       <div>${t2}</div>
     </div>
 
@@ -240,8 +393,6 @@ function agregar(tipo){
   `;
 
   document.getElementById(tipo).innerHTML += html;
-
-  // UX: limpiar hora+checks para cargar el siguiente partido más rápido
   limpiarFormulario();
 }
 
@@ -254,12 +405,14 @@ function editar(id){
   const el = document.getElementById(id);
   if (!el) return;
 
-  // precargar formulario desde data-*
+  const tipo = el.getAttribute("data-tipo");
   const t1 = el.getAttribute("data-t1");
   const t2 = el.getAttribute("data-t2");
   const hora = el.getAttribute("data-hora");
   const canales = (el.getAttribute("data-canales") || "").split(",").filter(Boolean);
-  const tipo = el.getAttribute("data-tipo");
+
+  competition.value = tipo;
+  recargarSelectsEquipos();
 
   team1.value = t1;
   team2.value = t2;
@@ -271,11 +424,11 @@ function editar(id){
 
   if (confirm("Reemplazar este partido con los valores del formulario?")) {
     eliminar(id);
-    agregar(tipo);
+    agregarDesdeFormulario();
   }
 }
 
-// DESCARGAR
+/* ====== DESCARGAR ====== */
 function descargar(){
   html2canvas(document.getElementById("flyer"), {backgroundColor: null}).then(canvas=>{
     const link=document.createElement("a");
@@ -285,6 +438,5 @@ function descargar(){
   });
 }
 </script>
-
 </body>
 </html>
